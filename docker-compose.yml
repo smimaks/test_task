@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - './src:/usr/src/app/src'
+#    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    networks:
+      - test_task
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.2.1-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - 'redis:/data'
+    networks:
+      - test_task
+#    logging:
+#      driver: none
+
+volumes:
+  redis:
+     driver: local
+
+networks:
+  test_task:
+    name: test_task
+    driver: bridge
